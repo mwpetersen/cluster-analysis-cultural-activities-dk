@@ -1,0 +1,129 @@
+---
+title: "A K-means clustering analysis of cultural activities in a subset of Danish Municipalities"
+subtitle: "Applied machine learning and big data, fall 2021"
+author: "Mikkel Wittenburg Petersen"
+date: "`r Sys.Date()`"
+toc-title: Contents
+output:
+  pagedown::html_paged: 
+    toc: true
+    number_sections: true
+    css:
+      - "../styles/fonts.css"
+      - default
+      - "../styles/custom-style.css"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(tidyverse)
+library(readxl)
+library(readr)
+library(clusterability)
+library(factoextra)
+library(NbClust)
+library(mapDK)
+```
+
+```{r import-data}
+
+df_cultural_activities <- read_excel("../data/use-of-cultural-activities-dk-2019.xlsx", skip = 2) %>%
+  select(-1)
+
+```
+
+```{r wrangle data}
+
+df_cultural_activities <- df_cultural_activities %>%
+  rename(kommune = `...2`) %>%
+  filter(!str_detect(kommune, 'Region|Province'))
+
+df_cultural_activities <- data.frame(df_cultural_activities, row.names = 1)
+
+df_cultural_activities <- as.data.frame(scale(df_cultural_activities))
+
+```
+
+
+
+# Abstract
+
+# Introduction
+
+# Method
+
+## Selecting a clustering algorithm: K-means clustering
+## Choosing number of clusters
+
+```{r}
+
+nc <- NbClust(df_cultural_activities, min.nc=2, max.nc = 15, method = "kmeans")
+
+fviz_nbclust(nc)
+
+fviz_nbclust(df_cultural_activities, kmeans, method = "wss")
+
+
+```
+
+
+## Validation of the results
+
+# Results
+
+```{r k-means-clustering}
+
+km_fit <- kmeans(df_cultural_activities, 3, nstart = 25)
+
+test <- km_fit$cluster
+
+df_cultural_activities_kmeans <- df_cultural_activities
+
+df_cultural_activities_kmeans$cluster <- test
+
+df_cultural_activities_kmeans %>%
+  count(cluster)
+
+df_cultural_activities_kmeans$kommune <- rownames(df_cultural_activities)  
+
+
+```
+
+
+
+## Visualize the results
+
+
+### Bivariate cluster plot
+
+Bivariate cluster plot
+```{r}
+
+fviz_cluster(km_fit, data = df_cultural_activities)
+
+```
+
+
+### Map of denmark with the clusters
+
+```{r map-clusters}
+
+mapDK(values = "cluster", id = "kommune", data = df_cultural_activities_kmeans)
+
+```
+
+
+## Interpret the results
+## Validation of the results
+
+### Are there clusters in the data?
+```{r dip-test}
+
+clusterabilitytest(df_cultural_activities, "dip")
+
+```
+
+
+# Discussion
+
+# Literature

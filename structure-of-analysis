@@ -1,0 +1,31 @@
+
+Structure of the analysis
+
+0. Abstract
+
+1. Introduction
+  - Context
+  - Purpose
+  - Hypothesis
+  - Data
+   - Choosing appropriate variables
+
+2. Method
+  - Selecting a clustering algorithm: K-means clustering
+  - Choosing number of clusters
+  - Validation of the results
+
+
+3. Results
+  - Visualize the results
+    - Bivariate cluster plot
+    - Map of denmark with the clusters
+
+  - Interpret results
+    - Describe the different clusters
+
+  - Validation of the results
+
+4. Discussion
+
+5. Literature

@@ -95,3 +95,23 @@ caption {
   break-inside: avoid;
   break-after: avoid;
 }
+
+.title {
+  margin: 100px 0px;  /* Vertical  Horizontal */
+}
+
+.subtitle, .author, .date {
+  font-weight: 400;
+}
+
+a {
+  text-decoration: none;
+}
+
+a:link, a:visited {
+  color: inherit;
+}
+
+a:hover {
+  color: #5c5c5c; /* dark grey */
+}

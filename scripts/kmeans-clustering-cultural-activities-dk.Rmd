@@ -23,6 +23,9 @@ library(clusterability)
 library(factoextra)
 library(NbClust)
 library(mapDK)
+library(janitor)
+
+theme_set(theme_minimal())
 ```
 
 ```{r import-data}
@@ -35,8 +38,9 @@ df_cultural_activities <- read_excel("../data/use-of-cultural-activities-dk-2019
 ```{r wrangle data}
 
 df_cultural_activities <- df_cultural_activities %>%
-  rename(kommune = `...2`) %>%
-  filter(!str_detect(kommune, 'Region|Province'))
+  rename(municipality = `...2`) %>%
+  filter(!str_detect(municipality, 'Region|Province')) %>%
+  janitor::clean_names()
 
 df_cultural_activities <- data.frame(df_cultural_activities, row.names = 1)
 

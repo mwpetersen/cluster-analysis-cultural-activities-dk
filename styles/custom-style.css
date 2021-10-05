@@ -68,6 +68,21 @@
     content: counter(page);
   }
 }
+@page :first {
+  @top-left {
+    content: none;
+  }
+  @top-right {
+    content: none;
+  }
+  @bottom-right {
+    content: none !important;
+  }
+  background-image: var(--front-cover);
+  background-position: right 10px top 10px;
+  background-size: 50px;
+  background-repeat: no-repeat;
+}
 
 /* page breaks; aka CSS fragmentation */
 .level1 {

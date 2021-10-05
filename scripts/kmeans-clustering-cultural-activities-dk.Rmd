@@ -5,7 +5,7 @@ author: "Mikkel Wittenburg Petersen"
 date: "`r Sys.Date()`"
 toc-title: Contents
 output:
-  pagedown::html_paged: 
+  pagedown::html_paged:
     toc: true
     number_sections: true
     css:

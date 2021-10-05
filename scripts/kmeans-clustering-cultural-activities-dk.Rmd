@@ -48,11 +48,22 @@ df_cultural_activities <- as.data.frame(scale(df_cultural_activities))
 
 ```
 
-
-
 # Abstract
 
 # Introduction
+
+This paper explores similarities and differences between Danish Municipalities in terms of cultural 
+habits of their citizens. Which Municipalities are alike and which differ? And *how* are they similar or different? 
+
+A common way to define different types of areas is to divide them into urban, suburban and
+rural areas. Many analyses (see e.g. Pew Research Center 2018) seek to explore whether there are systematic differences among these types of areas and communities — both politically, socially and culturally. In this paper I look at whether this division also emerges when looking at cultural
+habits between citizens in primarily urban, suburban or rural Danish Municipalities.
+
+The method I use to explore this is clustering. Specifically I use K-means and hierarchical
+clustering to group Municipalities by the cultural habits of their citizens.
+
+The data is from a survey from 2019 by Statistics Denmark. In the survey they asked citizens in 44
+Municipalities in Denmark about their use of cultural activities within the three months leading up to the survey. 
 
 # Method
 
@@ -131,3 +142,5 @@ clusterabilitytest(df_cultural_activities, "dip")
 # Discussion
 
 # Literature
+
+- Pew Research Center, May 2018, “What Unites and Divides Urban, Suburban and Rural Communities”

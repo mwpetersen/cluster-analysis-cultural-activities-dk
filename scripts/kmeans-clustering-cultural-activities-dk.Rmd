@@ -56,11 +56,13 @@ This paper explores similarities and differences between Danish Municipalities i
 habits of their citizens. Which Municipalities are alike and which differ? And *how* are they similar or different? 
 
 A common way to define different types of areas is to divide them into urban, suburban and
-rural areas. Many analyses (see e.g. Pew Research Center 2018) seek to explore whether there are systematic differences among these types of areas and communities — both politically, socially and culturally. In this paper I look at whether this division also emerges when looking at cultural
+rural areas. Many analyses (see e.g. Pew Research Center, 2018) seek to explore whether there are systematic differences among these types of areas and communities — both politically, socially and culturally. In this paper I look at whether this division also emerges when looking at cultural
 habits between citizens in primarily urban, suburban or rural Danish Municipalities.
 
 The method I use to explore this is clustering. Specifically I use K-means and hierarchical
-clustering to group Municipalities by the cultural habits of their citizens.
+clustering to group Municipalities by the cultural habits of their citizens. Clustering 
+is frequently used within the social sciences, especially in sociology (Ahlquist and Breunig, 2009).
+Examples of the use of clustering within the social sciences are Chae (2010) who explore groups in political attitude, and Franzoni (2008) who explore groups of welfare regimes.  
 
 The data is from a survey from 2019 by Statistics Denmark. In the survey they asked citizens in 44
 Municipalities in Denmark about their use of cultural activities within the three months leading up to the survey. 
@@ -142,5 +144,16 @@ clusterabilitytest(df_cultural_activities, "dip")
 # Discussion
 
 # Literature
+
+- Ahlquist, J. S. and Breunig, C. (2009). Country clustering in comparative po-
+litical economy. MPIfG Discussion Paper 09/5, Max-Planck-Institut für
+Gesellschaftsforschung, Köln.
+
+Chae, H. (2010). South Korean attitudes toward the ROK−U.S. alliance: group
+analysis. PS: Political Science and Politics 43, 493-501.
+
+- Franzoni, J. M. (2008). Welfare regimes in Latin America: capturing constella-
+tions of markets, families, and policies. Latin American Politics and Society
+50, 67-100.
 
 - Pew Research Center, May 2018, “What Unites and Divides Urban, Suburban and Rural Communities”

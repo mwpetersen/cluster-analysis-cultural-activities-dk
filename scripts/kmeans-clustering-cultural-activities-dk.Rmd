@@ -16,6 +16,7 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(knitr)
 library(tidyverse)
 library(readxl)
 library(readr)
@@ -37,14 +38,14 @@ df_cultural_activities <- read_excel("../data/use-of-cultural-activities-dk-2019
 
 ```{r wrangle data}
 
-df_cultural_activities <- df_cultural_activities %>%
+df_cultural_activities_clean <- df_cultural_activities %>%
   rename(municipality = `...2`) %>%
   filter(!str_detect(municipality, 'Region|Province')) %>%
   janitor::clean_names()
 
-df_cultural_activities <- data.frame(df_cultural_activities, row.names = 1)
+df_cultural_activities_all_numeric <- data.frame(df_cultural_activities_clean, row.names = 1)
 
-df_cultural_activities <- as.data.frame(scale(df_cultural_activities))
+df_cultural_activities_scaled <- as.data.frame(scale(df_cultural_activities_all_numeric))
 
 ```
 
@@ -68,21 +69,50 @@ The data is from a survey from 2019 by Statistics Denmark. In the survey they as
 Municipalities in Denmark about their use of cultural activities within the three months leading up to the survey. 
 
 # Method
+In this section I describe in detail how I explore similarities and differences between Danish Municipalities in terms of cultural habits of their citizens. Specifically, I describe the data and the methods used.
 
-## Selecting a clustering algorithm: K-means clustering
+## The data
+The data is from a Danish national survey from 2019 conducted by Statistics Denmark. Around 12.000
+people aged 16 and up participated in the survey (Statistics Denmark, 2021:7). 
+
+The purpose of the survey is to shed light on the cultural habits of the citizens of Denmark. Culture is in the survey defined in a broad sense and covers for instance concerts, theater, literature, cinema, exercise, computer games and other leisure activities. 
+
+The participants in the survey were asked how often within the last three months leading up to the survey they had participated in for instance the cultural activities listed above. 
+
+The data set used in this report is on an aggregated level. It shows for each municipality the percent of the adult population that had participated in the following cultural activities within the last three months leading up to the survey:
+
+- `r colnames(df_cultural_activities)[2]`
+- `r colnames(df_cultural_activities)[3]`
+- `r colnames(df_cultural_activities)[4]`
+- `r colnames(df_cultural_activities)[5]`
+- `r colnames(df_cultural_activities)[6]`
+- `r colnames(df_cultural_activities)[7]`
+- `r colnames(df_cultural_activities)[8]`
+- `r colnames(df_cultural_activities)[9]`
+- `r colnames(df_cultural_activities)[10]`
+
+Here's a look at the first five rows of the data set:
+```{r}
+
+knitr::kable(head(df_cultural_activities_clean[1:3], 3))
+
+```
+
+
+## K-means clustering and hierarchical clustering
+
 ## Choosing number of clusters
 
 ```{r}
 
-nc <- NbClust(df_cultural_activities, min.nc=2, max.nc = 15, method = "kmeans")
+nc <- NbClust(df_cultural_activities_scaled, min.nc=2, max.nc = 15, method = "kmeans")
 
 fviz_nbclust(nc)
 
-fviz_nbclust(df_cultural_activities, kmeans, method = "wss")
+fviz_nbclust(df_cultural_activities_scaled, kmeans, method = "wss")
 
 
 ```
-
 
 ## Validation of the results
 
@@ -90,18 +120,18 @@ fviz_nbclust(df_cultural_activities, kmeans, method = "wss")
 
 ```{r k-means-clustering}
 
-km_fit <- kmeans(df_cultural_activities, 3, nstart = 25)
+km_fit <- kmeans(df_cultural_activities_scaled, 3, nstart = 25)
 
 test <- km_fit$cluster
 
-df_cultural_activities_kmeans <- df_cultural_activities
+df_cultural_activities_kmeans <- df_cultural_activities_scaled
 
 df_cultural_activities_kmeans$cluster <- test
 
 df_cultural_activities_kmeans %>%
   count(cluster)
 
-df_cultural_activities_kmeans$kommune <- rownames(df_cultural_activities)  
+df_cultural_activities_kmeans$kommune <- rownames(df_cultural_activities_scaled)  
 
 
 ```
@@ -116,7 +146,7 @@ df_cultural_activities_kmeans$kommune <- rownames(df_cultural_activities)
 Bivariate cluster plot
 ```{r}
 
-fviz_cluster(km_fit, data = df_cultural_activities)
+fviz_cluster(km_fit, data = df_cultural_activities_scaled)
 
 ```
 
@@ -136,7 +166,7 @@ mapDK(values = "cluster", id = "kommune", data = df_cultural_activities_kmeans)
 ### Are there clusters in the data?
 ```{r dip-test}
 
-clusterabilitytest(df_cultural_activities, "dip")
+clusterabilitytest(df_cultural_activities_scaled, "dip")
 
 ```
 
@@ -145,15 +175,17 @@ clusterabilitytest(df_cultural_activities, "dip")
 
 # Literature
 
-- Ahlquist, J. S. and Breunig, C. (2009). Country clustering in comparative po-
-litical economy. MPIfG Discussion Paper 09/5, Max-Planck-Institut für
+- Ahlquist, J. S. and Breunig, C. (2009): "Country clustering in comparative po-
+litical economy". MPIfG Discussion Paper 09/5, Max-Planck-Institut für
 Gesellschaftsforschung, Köln.
 
-Chae, H. (2010). South Korean attitudes toward the ROK−U.S. alliance: group
-analysis. PS: Political Science and Politics 43, 493-501.
+Chae, H. (2010): "South Korean attitudes toward the ROK−U.S. alliance: group
+analysis". PS: Political Science and Politics 43, 493-501.
 
-- Franzoni, J. M. (2008). Welfare regimes in Latin America: capturing constella-
-tions of markets, families, and policies. Latin American Politics and Society
+- Franzoni, J. M. (2008): "Welfare regimes in Latin America: capturing constella-
+tions of markets, families, and policies". Latin American Politics and Society
 50, 67-100.
 
-- Pew Research Center, May 2018, “What Unites and Divides Urban, Suburban and Rural Communities”
+- Pew Research Center (2018): “What Unites and Divides Urban, Suburban and Rural Communities”
+
+- Statistics Denmark (2021): "Statistikdokumentation for Kulturvaneundersøgelsen 2021"

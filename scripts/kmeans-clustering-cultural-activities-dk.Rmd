@@ -96,8 +96,11 @@ knitr::kable(head(df_cultural_activities_clean[1:3], 3))
 
 ```
 
+## Clustering
 
-## K-means clustering and hierarchical clustering
+Clustering refers to a variety of algorithms for discovering subgroups (i.e. clusters) in a data set (James et. al 2021: 497). The goal is therefore to partition observations in a data set into distinct groups, such that the observations in a given group are more similar to each other than observations in other groups (Hastie 2009: 501). It is often used during the exploratory phase of a data analysis.
+
+### K-means clustering and hierarchical clustering
 
 
 

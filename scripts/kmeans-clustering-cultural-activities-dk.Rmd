@@ -116,11 +116,43 @@ gt(head(df_cultural_activities_clean[1:3], 3)) %>%
 
 ## Clustering
 
-Clustering refers to a variety of algorithms for discovering subgroups (i.e. clusters) in a data set (James et. al 2021: 497). The goal is therefore to partition observations in a data set into distinct groups, such that the observations in a given group are more similar to each other than observations in other groups (Hastie 2009: 501). The goal is not to predict an outcome, as is the case in supervised learning. Clustering is often used during the exploratory phase of a data analysis.
+Clustering refers to a variety of algorithms for discovering subgroups (i.e. clusters) in a data set (James et. al 2021: 497). The goal is therefore to partition observations in a data set into distinct groups, such that the observations in a given group are more similar to each other than observations in other groups (Hastie 2009: 501). As such, the goal is not to predict an outcome, as is the case in supervised learning. Clustering is often used during the exploratory phase of a data analysis. 
 
-### K-means clustering and hierarchical clustering
+The similarity and dissimilarity between data points are determined by the distance between them. The larger the distance, the more dissimilar the data points are.  The measure of distance that is most popular is the Euclidean distance (Kabacoff 2021:425). The Euclidean distance between two observations (typically two rows in a data set) is calculated by taking the square root of the total sum of the squared pairwise differences between all variables in the data set. 
 
+### Clustering algorithms used in this analysis
+In this analysis I have chosen to include two different clustering algorithms: 
+1. K-means clustering (belonging to the family of clustering approaches known as partitioning clustering) and 
+2. Hierarchical agglomerative clustering. 
 
+I have included both approaches to see how robust the results of the clustering are; do the two approaches cluster the data in the same way? 
+
+#### K-means clustering
+In K-means clustering you specify in advance the number of subgroups (K) the data should be partitioned into. When K is chosen, the algorithm consists of these steps (Kabacoff 2021:434):
+
+- Randomly select K rows to serve as centroids
+- Partition all observations to the closest centroid
+- Calculate the average of all the observations within each cluster to get the new centroids
+- Repartition each observations to the cluster with the nearest centroid
+- Continue step 3 and 4 until the clusters stay the same.
+
+The result of the above steps is a set of K clusters where the total sum of the within-cluster variation is as small as possible, given the data set and the specified number of clusters. The within-cluster variation in each cluster is calculated by taking the the sum of the squared Euclidean pairwise distances between all of the observations in the cluster, divided by the number of observations in the cluster (James et. al 2021:518).
+
+#### Hierarchical clustering
+Unlike K-means clustering, in hierarchical clustering you don’t choose the number of clusters in advance. Instead the number of clusters is chosen post hoc. The algorithm consists of these steps (Kabacoff 2021:428):
+
+- Each observation starts as its own cluster
+- Calculate the distances between all clusters
+- The two clusters with the smallest distance between them are merged into one cluster
+- Repeat steps 2 and 3 until all clusters are merged into one cluster with all the observations.
+
+The result of these steps can be visualized in a so-called dendrogram.
+As with K-means clustering, in hierarchical clustering the distance is often measured using the Euclidean measure of distance. Furthermore, when the clusters contain more than one observation, a measure of the distance between them needs to be chosen. This is called linkage. The most common types of linkage are complete, average, single and centroid (James et. al 2021:525). As an example, average linkage between two clusters is found by computing all pairwise distances between the observations in each cluster and taking the average of these distances.
+
+#### Advantages and disadvantages of both algorithms
+According to Kabacoff (2021:425), hierarchical clustering is most useful when you expect the clusters to 1) nested and 2) have a meaningful hierarchy. Another advantage is that you don’t have to specify the number of clusters in advance. A disadvantage of hierarchical clustering is that when an observation is assigned to a cluster, it will stay in that cluster and can’t be reassigned later. Furthermore, it can be difficult to interpret the result of a hierarchical cluster analysis if the data set is large (Kabacoff 2021:433). 
+
+In such cases, K-means clustering may be preferred. Another advantage of K-means clustering is that observations can be partitioned into different clusters during the clustering process if that improves the overall solution. It is therefore a more flexible approach compared to hierarchical clustering. A disadvantage of K-means clustering is that it doesn’t perform well when the data is non-convex (Kabacoff 2021:434).
 
 # Analysis
 

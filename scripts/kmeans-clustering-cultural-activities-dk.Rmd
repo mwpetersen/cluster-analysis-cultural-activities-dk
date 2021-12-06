@@ -1,5 +1,5 @@
 ---
-title: "A K-means clustering analysis of cultural activities in a subset of Danish Municipalities"
+title: "A clustering analysis of cultural activities in a subset of Danish Municipalities"
 subtitle: "Applied machine learning and big data, fall 2021"
 author: "Mikkel Wittenburg Petersen"
 date: "`r Sys.Date()`"
@@ -7,6 +7,7 @@ toc-title: Contents
 output:
   pagedown::html_paged:
     toc: true
+    fig_caption: true
     number_sections: true
     css:
       - "../styles/fonts.css"
@@ -26,6 +27,7 @@ library(NbClust)
 library(mapDK)
 library(janitor)
 library(gt)
+library(broom)
 
 theme_set(theme_minimal())
 ```
@@ -44,9 +46,9 @@ df_cultural_activities_clean <- df_cultural_activities %>%
   filter(!str_detect(municipality, 'Region|Province')) %>%
   janitor::clean_names()
 
-df_cultural_activities_all_numeric <- data.frame(df_cultural_activities_clean, row.names = 1)
+df_cultural_activities_all_numeric <- data.frame(df_cultural_activities_clean, row.names = 1) # Make the municipality column to an index
 
-df_cultural_activities_scaled <- as.data.frame(scale(df_cultural_activities_all_numeric))
+df_cultural_activities_scaled <- as.data.frame(scale(df_cultural_activities_all_numeric)) # Scale the data
 
 ```
 
@@ -156,64 +158,137 @@ In such cases, K-means clustering may be preferred. Another advantage of K-means
 
 # Analysis
 
-## Choosing number of clusters
+## K-means clustering
+
+### Choosing number of clusters
+The first step in the analysis is determining the optimal number of clusters. To do so I'll
+use two methods: 1) the "Elbow" method, and 2) the "silhouette" method. Furthermore I'll look at a
+summary of 26 methods to determine the optimal number of clusters. 
+
+The idea behind K-means clustering is to minimize the total within-groups sums of squares, and at the same time partitioning the data set in a sensible number of clusters (if each data point had its own cluster the total within-groups sums of squares would be 0, but the cluster analysis would be pointless). We can plot the total within-groups sums of squares for different values of K, as shown below:
+
+```{r fig1, fig.cap="The total within-groups sums of squares for different values of K.", fig.height=3}
+
+fviz_nbclust(df_cultural_activities_scaled, 
+             kmeans, 
+             method = "wss",
+             linecolor = "#2770D6") + 
+  labs(title= "Optimal number of clusters: the elbow method") 
+
+```
+A strategy is to choose a number of clusters so that the total within-groups sums of squares doesn't change much by adding one more cluster. Thus in the plot you can look for a bend (the elbow) to determine the optimal number of clusters.Figure \@ref(fig:fig1) above shows "an elbow" at 2 or 3 clusters.
+
+An alternative method is the "silhouette" method.
+
+
+```{r fig2, fig.height=3}
+
+p <- fviz_nbclust(df_cultural_activities_scaled, 
+             kmeans, 
+             method = "silhouette",
+             linecolor = "#2770D6"
+             ) 
+
+p + labs(title= "Optimal number of clusters: the silhouette method") 
+
+```
+
+
+
+```{r include=FALSE}
+
+nc <- NbClust(df_cultural_activities_scaled,
+              min.nc=2, 
+              max.nc = 15, 
+              method = "kmeans")
+
+```
 
 ```{r}
 
-nc <- NbClust(df_cultural_activities_scaled, min.nc=2, max.nc = 15, method = "kmeans")
+p <- ggplot(data=as.data.frame(table(nc$Best.n[1,])), 
+            aes(x=Var1, y=Freq)) +
+  geom_col(fill = "#2770D6") +
+  geom_text(
+    aes(label = Freq),
+    vjust = 2,
+    size = 4, fontface = "bold", color = "white") +
+  ylab("Frequency among all indices") + 
+  xlab("Number of clusters K") +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank(),
+    panel.background = element_blank(),
+    axis.title=element_text(size=12),
+    axis.text.y=element_blank(),
+    axis.text.x = element_text(size = 14, 
+                               margin=margin(t=-10))) 
 
-fviz_nbclust(nc)
-
-fviz_nbclust(df_cultural_activities_scaled, kmeans, method = "wss")
-
+p
+  
+  
+  
 
 ```
 
-## Validation of the results
-
+## Performing K-means clustering
 ```{r k-means-clustering}
 
-km_fit <- kmeans(df_cultural_activities_scaled, 3, nstart = 25)
+df_cultural_activities_clust <- kmeans(df_cultural_activities_scaled, centers = 3, nstart = 50)
 
-test <- km_fit$cluster
-
-df_cultural_activities_kmeans <- df_cultural_activities_scaled
-
-df_cultural_activities_kmeans$cluster <- test
-
-df_cultural_activities_kmeans %>%
-  count(cluster)
-
-df_cultural_activities_kmeans$kommune <- rownames(df_cultural_activities_scaled)  
+glance(df_cultural_activities_clust)
 
 
 ```
 
+```{r}
+
+augment(df_cultural_activities_clust, df_cultural_activities_scaled) 
+
+
+
+```
+
+```{r}
+
+#df_cultural_activities_kmeans %>%
+#  count(cluster)
+
+#df_cultural_activities_kmeans$kommune <- rownames(df_cultural_activities_scaled)
+
+```
 
 
 ## Visualize the results
-
 
 ### Bivariate cluster plot
 
 Bivariate cluster plot
 ```{r}
-
-fviz_cluster(km_fit, data = df_cultural_activities_scaled)
-
+fviz_cluster(df_cultural_activities_clust, 
+             data = df_cultural_activities_scaled,
+             ggtheme = theme_minimal()) + 
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank()
+  )
 ```
+
+
 
 
 ### Map of denmark with the clusters
 
 ```{r map-clusters}
 
-mapDK(values = "cluster", id = "kommune", data = df_cultural_activities_kmeans)
+#mapDK(values = "cluster", id = "kommune", data = df_cultural_activities_kmeans)
 
 ```
 
-
 ## Interpret the results
+
 ## Validation of the results
 
 ### Are there clusters in the data?

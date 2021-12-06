@@ -82,15 +82,24 @@ The participants in the survey were asked how often within the last three months
 
 The data set used in this report is on an aggregated level. It shows for each municipality the percent of the adult population that had participated in the following cultural activities within the last three months leading up to the survey:
 
+:::: {style="display: flex;"}
+
+::: {}
 - `r colnames(df_cultural_activities)[2]`
 - `r colnames(df_cultural_activities)[3]`
 - `r colnames(df_cultural_activities)[4]`
 - `r colnames(df_cultural_activities)[5]`
+:::
+
+::: {}
 - `r colnames(df_cultural_activities)[6]`
 - `r colnames(df_cultural_activities)[7]`
 - `r colnames(df_cultural_activities)[8]`
 - `r colnames(df_cultural_activities)[9]`
 - `r colnames(df_cultural_activities)[10]`
+:::
+
+::::
 
 Here's a look at the first 3 rows and columns of the data set:
 ```{r}
@@ -167,7 +176,7 @@ summary of 26 methods to determine the optimal number of clusters.
 
 The idea behind K-means clustering is to minimize the total within-groups sums of squares, and at the same time partitioning the data set in a sensible number of clusters (if each data point had its own cluster the total within-groups sums of squares would be 0, but the cluster analysis would be pointless). We can plot the total within-groups sums of squares for different values of K, as shown below:
 
-```{r fig1, fig.cap="The total within-groups sums of squares for different values of K.", fig.height=3}
+```{r fig1-cluster, fig.height=4, fig.cap="The total within-groups sums of squares for different values of K."}
 
 fviz_nbclust(df_cultural_activities_scaled, 
              kmeans, 
@@ -176,12 +185,11 @@ fviz_nbclust(df_cultural_activities_scaled,
   labs(title= "Optimal number of clusters: the elbow method") 
 
 ```
-A strategy is to choose a number of clusters so that the total within-groups sums of squares doesn't change much by adding one more cluster. Thus in the plot you can look for a bend (the elbow) to determine the optimal number of clusters.Figure \@ref(fig:fig1) above shows "an elbow" at 2 or 3 clusters.
+A strategy is to choose a number of clusters so that the total within-groups sums of squares doesn't change much by adding one more cluster. Thus in the plot you can look for a bend (the elbow) to determine the optimal number of clusters. Figure \@ref(fig:fig1-cluster) above shows "an elbow" at 2 or 3 clusters.
 
-An alternative method is the "silhouette" method.
+An alternative method is the "silhouette" method. The method measures the quality of a clustering  	(Boehmke, n.d.). The higher the average silhouette width, the better the clustering. The method computes the average width for every specified value of K. And the optimal number of clusters is the one with the highest average silhouette width.
 
-
-```{r fig2, fig.height=3}
+```{r fig2-cluster, fig.height=4, fig.cap="The average silhouette width for different values of K."}
 
 p <- fviz_nbclust(df_cultural_activities_scaled, 
              kmeans, 
@@ -193,7 +201,9 @@ p + labs(title= "Optimal number of clusters: the silhouette method")
 
 ```
 
+In Figure \@ref(fig:fig2-cluster) above we can see that the silhouette method suggests K = 2 as the optimal number of clusters. And K = 3 is the second optimal number of clusters.
 
+The `NbClust` package includes 30 methods for selecting the optimal value of K. How many of the 30 that can be used depends on the data set (Kabacoff 2021:436). Below is a summary of what these methods suggest as the optimal value of K for our data set at hand. 8 out of 26 methods/indices suggest 2 as the optimal value of K. 6 methods suggest K = 3.
 
 ```{r include=FALSE}
 
@@ -204,7 +214,7 @@ nc <- NbClust(df_cultural_activities_scaled,
 
 ```
 
-```{r}
+```{r fig3-cluster, fig.height=4, fig.cap="Number of methods in `NbClust` suggesting different values of K."}
 
 p <- ggplot(data=as.data.frame(table(nc$Best.n[1,])), 
             aes(x=Var1, y=Freq)) +
@@ -213,6 +223,7 @@ p <- ggplot(data=as.data.frame(table(nc$Best.n[1,])),
     aes(label = Freq),
     vjust = 2,
     size = 4, fontface = "bold", color = "white") +
+  labs(title= "Optimal number of clusters: summary") +
   ylab("Frequency among all indices") + 
   xlab("Number of clusters K") +
   theme_minimal() +
@@ -224,7 +235,8 @@ p <- ggplot(data=as.data.frame(table(nc$Best.n[1,])),
     axis.title=element_text(size=12),
     axis.text.y=element_blank(),
     axis.text.x = element_text(size = 14, 
-                               margin=margin(t=-10))) 
+                               margin=margin(t=-10)))
+  
 
 p
   
@@ -307,12 +319,18 @@ clusterabilitytest(df_cultural_activities_scaled, "dip")
 litical economy". MPIfG Discussion Paper 09/5, Max-Planck-Institut für
 Gesellschaftsforschung, Köln.
 
-Chae, H. (2010): "South Korean attitudes toward the ROK−U.S. alliance: group
+- Boehmke, Bradley (n.d.). K-means Cluster Analysis. Retrieved December 6, 2021, from http://uc-r.github.io/kmeans_clustering
+
+- Chae, H. (2010): "South Korean attitudes toward the ROK−U.S. alliance: group
 analysis". PS: Political Science and Politics 43, 493-501.
 
 - Franzoni, J. M. (2008): "Welfare regimes in Latin America: capturing constella-
 tions of markets, families, and policies". Latin American Politics and Society
 50, 67-100.
+
+- James, Gareth, et al. An Introduction to Statistical Learning. 2nd ed., Springer, 2021.
+
+- Kabacoff, R. I. (2021). R in Action (3rd ed.). Manning Publications.
 
 - Pew Research Center (2018): “What Unites and Divides Urban, Suburban and Rural Communities”
 

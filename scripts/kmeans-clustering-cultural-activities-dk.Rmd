@@ -285,7 +285,7 @@ fviz_cluster(df_cultural_activities_clust_2,
 
 ```
 
-In plot \@ref(fig:fig5-cluster) below we can see that the main difference between running the analysis with 2 or 3 clusters is that cluster 2 in plot \@ref(fig:fig4-cluster) is now divided in two. Frederiksberg, Copenhagen, Gentofte and Aarhus are now in their own cluster. 
+In figure \@ref(fig:fig5-cluster) below we can see that the main difference between running the analysis with 2 or 3 clusters is that cluster 2 in figure \@ref(fig:fig4-cluster) is now divided in two. Frederiksberg, Copenhagen, Gentofte and Aarhus are now in their own cluster. 
 ```{r fig5-cluster, fig.height=4, fig.cap="Bivariate cluster plot with K = 3"}
 
 fviz_cluster(df_cultural_activities_clust_3, 
@@ -299,135 +299,119 @@ fviz_cluster(df_cultural_activities_clust_3,
 
 ```
 
-Another way to visualize the clusters are with maps. I have done this below. What do the maps show? Do they show that there are systematic differences in the cultural habits between citizens in primarily urban, suburban or rural Danish Municipalities? To some extent they do. But the picture is not that clear cut.
+Another way to visualize the clusters are with maps. I have done this below. What do the maps show? Do they show that there are systematic differences in the cultural habits between citizens in primarily urban, suburban or rural Danish Municipalities? To some extent they do. But the picture is not that clear cut. In figure \@ref(fig:map-clusters-2) we see that cluster 2 contains municipalities with the large or medium-sized cities on the East coast of Jutland, Odense on the island of Funen, and a number of municipalities in the area of Copenhagen and North Zealand. Cluster 1 contains Municipalities in Jutland, Funen and West and South Zealand.
 
-```{r map-clusters-2, warning=FALSE, message=FALSE}
+```{r map-clusters-2, warning=FALSE, message=FALSE, fig.cap="Map with municipalities grouped in 2 clusters"}
 
 df_cluster_2$municipality[df_cluster_2$municipality== "Copenhagen"] <- "København"
 
-mapDK(values = "Cluster", id = "municipality", data = df_cluster_2)
+mapDK(values = "Cluster", id = "municipality", data = df_cluster_2, map.title = "Map with municipalities grouped in 2 clusters")
 
 ```
+In figure \@ref(fig:map-clusters-3) we see that with 3 clusters Copenhagen, Frederiksberg, Gentofte and Aarhus are now in their own cluster. 
 
-```{r map-clusters-3, warning=FALSE, message=FALSE}
+```{r map-clusters-3, warning=FALSE, message=FALSE, fig.cap="Map with municipalities grouped in 3 clusters"}
 
 df_cluster_3$municipality[df_cluster_3$municipality== "Copenhagen"] <- "København"
 
-mapDK(values = "Cluster", id = "municipality", data = df_cluster_3)
+mapDK(values = "Cluster", id = "municipality", data = df_cluster_3, map.title = "Map with municipalities grouped in 2 clusters")
 
 ```
 
 ## How do the clusters differ?
 
 ```{r}
+df_cluster_2_new_columns <- df_cluster_2 %>%
+  rename("Been to the cinema" = have_been_to_the_cinema,
+         "Been to concert" = have_been_to_concert,
+         "Seen visual arts" = have_seen_visual_arts_on_pupose, 
+         "Read or listened to fiction" = have_read_or_listened_to_fiction,
+         "Read or listened to non-fiction" = have_read_or_listened_to_non_fiction,
+         "Visited library" = have_visited_the_library_physical_visit,
+         "Used librarys digital services" = have_used_the_librarys_digital_services,
+         "Visited museum" = visited_a_museum_etc,
+         "Watched performing arts" = have_watched_performing_arts_in_theater_opera_festivals_or_in_public_spaces)
 
-df_cluster_2_summary <- df_cluster_2 %>%
+df_cluster_3_new_columns <- df_cluster_3 %>%
+  rename("Been to the cinema" = have_been_to_the_cinema,
+         "Been to concert" = have_been_to_concert,
+         "Seen visual arts" = have_seen_visual_arts_on_pupose, 
+         "Read or listened to fiction" = have_read_or_listened_to_fiction,
+         "Read or listened to non-fiction" = have_read_or_listened_to_non_fiction,
+         "Visited library" = have_visited_the_library_physical_visit,
+         "Used librarys digital services" = have_used_the_librarys_digital_services,
+         "Visited museum" = visited_a_museum_etc,
+         "Watched performing arts" = have_watched_performing_arts_in_theater_opera_festivals_or_in_public_spaces)
+```
+
+
+```{r}
+
+df_cluster_2_summary <- df_cluster_2_new_columns %>%
   group_by(Cluster) %>%
   summarise(across(where(is.numeric), mean)) %>%
-  mutate(across(where(is.numeric), round, 1))
+  mutate(across(where(is.numeric), round, 1)) %>%
+  pivot_longer(!Cluster, names_to = "cultural_activity", values_to = "percentage") %>%
+  arrange(Cluster)
 
-df_cluster_3_summary <- df_cluster_3 %>%
+df_cluster_3_summary <- df_cluster_3_new_columns %>%
   group_by(Cluster) %>%
   summarise(across(where(is.numeric), mean)) %>%
-  mutate(across(where(is.numeric), round, 1))
+  mutate(across(where(is.numeric), round, 1)) %>%
+  pivot_longer(!Cluster, names_to = "cultural_activity", values_to = "percentage") %>%
+  arrange(Cluster)
 
 ```
-
 
 ```{r}
+p <- ggplot(df_cluster_2_summary, 
+            aes(x=cultural_activity, y=percentage, fill=Cluster)) + 
+  geom_bar(position= position_dodge2(), stat="identity") +
+  scale_fill_manual(values = c("#2770D6","gray60")) +
+  geom_text(aes(label = paste0(percentage,"%"), y = percentage - 4.5),
+            position = position_dodge(width = 0.9),
+            color = "white") +
+  labs(title= "Differences in cultural habits between cluster 1 and 2") +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank(),
+    panel.background = element_blank(),
+    axis.text.x=element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.text.y = element_text(size = 12)) +
+  coord_flip()
 
-df_cluster_2_summary %>%
-  select(1:4) %>%
-  gt(.) %>%
-    tab_options(table.align='left',
-                table.width = pct(100),
-                column_labels.border.bottom.width= px(3),
-                column_labels.border.bottom.color= "black",
-                column_labels.border.top.color = "white") %>%
-    tab_style(
-      style = list(
-        cell_text(weight = "bold")
-        ),
-      locations = cells_column_labels()) %>%
-    tab_style(
-      style = list(
-        cell_fill(color = "white")
-      ),
-      locations = cells_body(
-        rows = 2)
-    ) %>%
-  cols_label(
-    have_been_to_the_cinema = "Been to the cinema",
-    have_been_to_concert = "Been to concert",
-    have_seen_visual_arts_on_pupose = "Seen visual arts"
-  )
-
-
+p
+  
 ```
 
-test
+```{r fig.height=7}
+p <- ggplot(df_cluster_3_summary, 
+            aes(x=cultural_activity, y=percentage, fill=Cluster)) + 
+  geom_bar(position= position_dodge2(), stat="identity") +
+  scale_fill_manual(values = c("#2770D6","gray60", "#76a29f")) +
+  geom_text(aes(label = paste0(percentage,"%"), y = percentage - 4.5),
+            position = position_dodge(width = 0.9),
+            color = "white") +
+  labs(title= "Differences in cultural habits between cluster 1 and 2") +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank(),
+    panel.background = element_blank(),
+    axis.text.x=element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.text.y = element_text(size = 12)) +
+  coord_flip()
 
-```{r}
-
-df_cluster_2_summary %>%
-  select(c(1, 5, 6, 7)) %>%
-  gt(.) %>%
-    tab_options(table.align='left',
-                table.width = pct(100),
-                column_labels.border.bottom.width= px(3),
-                column_labels.border.bottom.color= "black",
-                column_labels.border.top.color = "white") %>%
-    tab_style(
-      style = list(
-        cell_text(weight = "bold")
-        ),
-      locations = cells_column_labels()) %>%
-    tab_style(
-      style = list(
-        cell_fill(color = "white")
-      ),
-      locations = cells_body(
-        rows = 2)
-    ) %>%
-  cols_label(
-    have_read_or_listened_to_fiction = "Read or listened to fiction",
-    have_read_or_listened_to_non_fiction = "Read or listened to non-fiction",
-    have_visited_the_library_physical_visit = "Visited library"
-  )
-
+p
 ```
 
-test
-
-```{r}
-
-df_cluster_2_summary %>%
-  select(c(1, 8, 9, 10)) %>%
-  gt(.) %>%
-    tab_options(table.align='left',
-                table.width = pct(100),
-                column_labels.border.bottom.width= px(3),
-                column_labels.border.bottom.color= "black",
-                column_labels.border.top.color = "white") %>%
-    tab_style(
-      style = list(
-        cell_text(weight = "bold")
-        ),
-      locations = cells_column_labels()) %>%
-    tab_style(
-      style = list(
-        cell_fill(color = "white")
-      ),
-      locations = cells_body(
-        rows = 2)
-    ) %>%
-  cols_label(
-    have_used_the_librarys_digital_services = "Used librarys digital services",
-    visited_a_museum_etc = "Visited museum",
-    have_watched_performing_arts_in_theater_opera_festivals_or_in_public_spaces = "Watched performing arts"
-  )
-
-```
 
 ## Validation of the results
 
@@ -438,8 +422,6 @@ clusterabilitytest(df_cultural_activities_scaled, "dip")
 
 ```
 
-
-# Discussion
 
 # Literature
 

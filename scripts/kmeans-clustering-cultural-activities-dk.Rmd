@@ -62,25 +62,24 @@ This paper explores similarities and differences between Danish Municipalities i
 habits of their citizens. Which Municipalities are alike and which differ? And *how* are they similar or different? 
 
 A common way to define different types of areas is to divide them into urban, suburban and
-rural areas. Many analyses (see e.g. Pew Research Center, 2018) seek to explore whether there are systematic differences among these types of areas and communities — both politically, socially and culturally. In this paper I look at whether this division also emerges when looking at cultural
-habits between citizens in primarily urban, suburban or rural Danish Municipalities.
+rural areas. Many analyses (see e.g. Pew Research Center, 2018) seek to explore whether there are systematic differences among these types of areas and communities — both politically, socially and culturally. In this paper I look at whether this division also emerges when looking at cultural habits between citizens in primarily urban, suburban and rural Danish Municipalities.
 
 The method I use to explore this is clustering. Specifically I use K-means and hierarchical
 clustering to group Municipalities by the cultural habits of their citizens. Clustering 
 is frequently used within the social sciences, especially in sociology (Ahlquist and Breunig, 2009).
-Examples of the use of clustering within the social sciences are Chae (2010) who explore groups in political attitude, and Franzoni (2008) who explore groups of welfare regimes.  
+Examples of the use of clustering within the social sciences are Chae (2010) who explore groups of political attitudes, and Franzoni (2008) who explore groups of welfare regimes.  
 
 The data is from a survey from 2019 by Statistics Denmark. In the survey they asked citizens in 44
-Municipalities in Denmark about their use of cultural activities within the three months leading up to the survey. 
+Municipalities in Denmark about their use of cultural activities within the 3 months leading up to the survey. 
 
 # Method
-In this section I describe in detail how I explore similarities and differences between Danish Municipalities in terms of cultural habits of their citizens. Specifically, I describe the data and the methods used.
+In this section I describe how I explore similarities and differences between Danish Municipalities in terms of cultural habits of their citizens. Specifically, I describe the data and the clustering methods used.
 
 ## The data
 The data is from a Danish national survey from 2019 conducted by Statistics Denmark. Around 12.000
 people aged 16 and up participated in the survey (Statistics Denmark, 2021:7). 
 
-The purpose of the survey is to shed light on the cultural habits of the citizens of Denmark. Culture is in the survey defined in a broad sense and covers for instance concerts, theater, literature, cinema, exercise, computer games and other leisure activities. 
+The purpose of the survey is to shed light on the cultural habits of the citizens of Denmark. Culture is in the survey defined in a broad sense and covers for instance concerts, theater, literature, cinema, and other leisure activities. 
 
 The participants in the survey were asked how often within the last three months leading up to the survey they had participated in for instance the cultural activities listed above. 
 
@@ -170,7 +169,7 @@ The result of these steps can be visualized in a so-called dendrogram.
 As with K-means clustering, in hierarchical clustering the distance is often measured using the Euclidean measure of distance. Furthermore, when the clusters contain more than one observation, a measure of the distance between them needs to be chosen. This is called linkage. The most common types of linkage are complete, average, single and centroid (James et. al 2021:525). As an example, average linkage between two clusters is found by computing all pairwise distances between the observations in each cluster and taking the average of these distances.
 
 #### Advantages and disadvantages of both algorithms
-According to Kabacoff (2021:425), hierarchical clustering is most useful when you expect the clusters to 1) nested and 2) have a meaningful hierarchy. Another advantage is that you don’t have to specify the number of clusters in advance. A disadvantage of hierarchical clustering is that when an observation is assigned to a cluster, it will stay in that cluster and can’t be reassigned later. Furthermore, it can be difficult to interpret the result of a hierarchical cluster analysis if the data set is large (Kabacoff 2021:433). 
+According to Kabacoff (2021:425), hierarchical clustering is most useful when you expect the clusters to 1) be nested and 2) have a meaningful hierarchy. Another advantage is that you don’t have to specify the number of clusters in advance. A disadvantage of hierarchical clustering is that when an observation is assigned to a cluster, it will stay in that cluster and can’t be reassigned later. Furthermore, it can be difficult to interpret the result of a hierarchical cluster analysis if the data set is large (Kabacoff 2021:433). 
 
 In such cases, K-means clustering may be preferred. Another advantage of K-means clustering is that observations can be partitioned into different clusters during the clustering process if that improves the overall solution. It is therefore a more flexible approach compared to hierarchical clustering. A disadvantage of K-means clustering is that it doesn’t perform well when the data is non-convex (Kabacoff 2021:434).
 
@@ -181,7 +180,7 @@ In such cases, K-means clustering may be preferred. Another advantage of K-means
 ### Choosing number of clusters
 The first step in the analysis is determining the optimal number of clusters. To do so I'll
 use two methods: 1) the "Elbow" method, and 2) the "silhouette" method. Furthermore I'll look at a
-summary of 26 methods to determine the optimal number of clusters. 
+summary of 26 methods found in the `NbClust` R package to determine the optimal number of clusters. 
 
 The idea behind K-means clustering is to minimize the total within-groups sums of squares, and at the same time partitioning the data set in a sensible number of clusters (if each data point had its own cluster the total within-groups sums of squares would be 0, but the cluster analysis would be pointless). We can plot the total within-groups sums of squares for different values of K, as shown below:
 
@@ -254,7 +253,7 @@ p
 ## Performing K-means clustering
 A K-means clustering is performed with the `kmeans()` function. I have performed a clustering with both 2 and 3 clusters. The results can be seen below in the bivariate cluster plots, maps of Denmark and tables.
 
-The bivariate cluster plots show the municipalities on the first two principal components. The principal components summarize the variation in the 9 variables about cultural habits.
+The bivariate cluster plots show the Municipalities on the first two principal components. The principal components summarize the variation in the 9 variables about cultural habits.
 
 ```{r k-means-clustering}
 set.seed(1234)
@@ -303,7 +302,7 @@ fviz_cluster(df_cultural_activities_clust_3,
 
 ```
 
-Another way to visualize the clusters are with maps. I have done this below. What do the maps show? Do they show that there are systematic differences in the cultural habits between citizens in primarily urban, suburban or rural Danish Municipalities? To some extent they do. But the picture is not that clear cut. In figure \@ref(fig:map-clusters-2) we see that cluster 2 contains municipalities with the large or medium-sized cities on the East coast of Jutland, Odense on the island of Funen, and a number of municipalities in the area of Copenhagen and North Zealand. Cluster 1 contains Municipalities in Jutland, Funen and West and South Zealand.
+Another way to visualize the clusters are with maps. I have done this below. What do the maps show? Do they show that there are systematic differences in the cultural habits between citizens in primarily urban, suburban and rural Danish Municipalities? To some extent they do. But the picture is not that clear cut. In figure \@ref(fig:map-clusters-2) we see that cluster 2 contains Municipalities with the large or medium-sized cities on the East coast of Jutland, Odense on the island of Funen, and a number of Municipalities in the area of Copenhagen and North Zealand. Cluster 1 contains Municipalities in Jutland, Funen and West and South Zealand.
 
 ```{r map-clusters-2, warning=FALSE, message=FALSE, fig.cap="Map with municipalities grouped in 2 clusters."}
 
@@ -420,7 +419,7 @@ p
 ```
 
 ## Hierarchical clustering
-In this section I will perform a hierarchical cluster analysis on the cultural habits data set. This I will do in order to compare the results of the hierarchical clustering with the K-means clustering. I have included both approaches to see how robust the results of the clustering are; do the two approaches cluster the data in the same way? 
+In this section I will perform a hierarchical cluster analysis on the cultural habits data set. This I will do in order to compare the results of the hierarchical clustering with the K-means clustering. I have included both approaches to see how robust the results of the cluster analyses are; do the two approaches cluster the data in the same way? 
 
 I have performed the clustering with average linkage as the measure of distance between two clusters (Kabacoff 2021:428). Let's compare the results of the hierarchical clustering and the K-means clustering. Below is two dendrograms showing the result of the hierarchical clustering when the cut is made with 2 and 3 clusters respectively. 
 
@@ -453,9 +452,9 @@ colorhcplot(df_cultural_activities_hier_clust, cl, hang=-1, lwd=2,
             main="Average-Linkage Clustering\n3 Cluster Solution")
 
 ```
-The cross table below shows the similarity in the results clearly.
+The cross table \@ref(tab:cluster-crosstable) below clearly shows the similarity in the results.
 
-```{r fig10-cluster, fig.cap="Cross table with the K = 3 K-means solution and the cut = 3 hierarchical solution"}
+```{r}
 df_cluster_3$clusters_h <- clusters_3
 
 df_cluster_3_new <- df_cluster_3 %>%
@@ -470,7 +469,7 @@ df_cluster_3_new <- df_cluster_3 %>%
   )) 
 ```
 
-```{r}
+```{r cluster-crosstable}
 
 tbl_cross(
   df_cluster_3_new,
@@ -478,6 +477,7 @@ tbl_cross(
   col = `K-means clustering`,
   margin=NULL
 ) %>%
+  modify_caption("**Comparison of the K-means and hierarchical cluster analysis**") %>%
   as_gt() %>%
   tab_style(
     style = list(
